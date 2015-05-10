@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="tr-TR">
+    <head>
+        <meta charset="UTF-8">
+        <title>2015 Türkiye Genel Seçim Sonuçları</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- SEO -->
+        <meta name="author" content="Cihad Turhan">
+        <meta name="description" content="Türkiye Haritası Örnek Kullanımı - Genel Seçim Sonuçları">
+        <meta name="keywords" content="geojson, türkiye, harita, map, turkey, tr, javascript, json">
+        <link rel="canonical" href="preview.png">
+
+
+        <!-- Social: Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@github">
+        <meta name="twitter:creator" content="@cihadturhan">
+        <meta name="twitter:title" content="Türkiye Haritası Örnek Kullanımı - Genel Seçim Sonuçları">
+        <meta name="twitter:description" content="Türkiye Haritasının geojson formatı ve DC kütüphanesiyle interaktif kullanımı">
+        <meta name="twitter:image:src" content="preview.png">
+
+        <!-- Social: Facebook / Open Graph -->
+        <meta property="og:url" content="https://github.com/cihadturhan/tr-geojson">
+        <meta property="og:type" content="article">
+        <meta property="og:title" content="Türkiye Haritası Örnek Kullanımı - Genel Seçim Sonuçları">
+        <meta property="og:image" content="preview.png">
+        <meta property="og:description" content="Türkiye Haritasının geojson formatı ve DC kütüphanesiyle interaktif kullanımı">
+        <meta property="og:site_name" content="Türkiye Haritası Örnek Kullanımı">
+        <meta property="article:author" content="https://www.facebook.com/cihad.turhan">
+        <meta property="article:publisher" content="https://www.facebook.com/cihad.turhan">
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/dc.css"/>
+        <style>
+            .node>text {
+                text-shadow: 0px 0 1px hsla(0,0%,100%,0.5);
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+
+        <a href="https://github.com/cihadturhan/tr-geojson"><img style="position: absolute; top: 0; right: 0; border: 0;"
+                                                          src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
+                                                          alt="Fork me on GitHub"></a>
+
+        <div class="container">
+            <div class="row">
+            <div class="col-xs-12">    
+                    <h2 class="text-center page-header">2015 Türkiye Genel Seçim Sonuçları</h2>
+                    
+                     <ul>
+                        <li>Herhangi bir şehir veya baloncuğa tıklayın</li>
+                        <li>Aynı anda birden fazlasına tıklayabilirsiniz</li>
+                    </ul>
+
+                    <hr/>
+
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                                <a class="pull-right" href="javascript:dc.filterAll(); dc.renderAll();">Tümünü sıfırla</a>
+
+                                <div id="tr-chart">
+                                        <strong>Seçmenlerin şehirlere göre dağılımı.</strong> (Renk Yoğunluğu - Seçmen sayısı)
+                                        <span class="reset" style="display: none;"> | Şu anki filtre: <span class="filter"></span></span>
+                                        <a class="reset" href="javascript:trChart.filterAll();dc.redrawAll();" style="display: none;">Sıfırla</a>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+                        </div>
+
+                    </div>
+
+                    <div id="party-chart">
+                        <strong>Partilerin Milletvekili/Oy Dağılımı</strong> (Yatay - Milletvekili sayısı, Dikey - Partinin toplam oyu, yarıçap - oy/milletvekili oranı)
+                        <a class="reset" href="javascript:partyChart.filterAll();dc.redrawAll();" style="display: none;">Sıfırla</a>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+        <script type="text/javascript" src="js/d3.js">
+
+</script>
+        <script type="text/javascript" src="js/crossfilter.js">
+
+</script>
+        <script type="text/javascript" src="js/dc.js">
+
+</script>
+        <script type="text/javascript" src="js/colorbrewer.js">
+
+</script>
+        <script type="text/javascript">
+
+
+var numberFormat = d3.format(".2f");
+
+var trChart = dc.geoChoroplethChart("#tr-chart");
+var partyChart = dc.bubbleChart("#party-chart");
+
+d3.csv("sonuclar.csv", function(csv) {
+    var data = crossfilter(csv);
+    
+    var cities = data.dimension(function(d) {
+        return d["City"];
+    });
+    var stateRaisedSum = cities.group().reduceSum(function(d) {
+        return d["Votes"];
+    });
+    
+    var Parties = data.dimension(function(d) {
+        return d["Parties"];
+    });
+    var statsByParties = Parties.group().reduce(
+    function(p, v) {
+        p.Deputies += +v["Deputies"];
+        p.votes += +v["Votes"];
+        return p;
+    }, 
+    function(p, v) {
+        p.Deputies -= +v["Deputies"];
+        p.votes -= +v["Votes"];
+        return p;
+    }, 
+    function() {
+        return {Deputies: 0,votes: 0}
+    }
+    );
+    
+    var rounds = data.dimension(function(d) {
+        return d["Subregion"];
+    });
+    
+    
+    var projection = d3.geo.mercator()
+    .scale(2000)
+    .center([35.243322, 38.963745])
+    .precision(0.1);
+    
+    d3.json("geo/tr-cities-utf8.json", function(statesJson) {
+        trChart.width(990)
+        .height(500)
+        .dimension(cities)
+        .group(stateRaisedSum)
+        .colors(d3.scale.quantize().range(colorbrewer.OrRd[4]))
+        .colorDomain([0, 1e6])
+        .colorCalculator(function(d) {
+            return d ? trChart.colors()(d) : '#ccc';
+        })
+        .overlayGeoJson(statesJson.features, "state", function(d) {
+            return d.properties.name;
+        }).projection(projection)
+        .title(function(d) {
+            return "Şehir: " + d.key + "\nToplam Oy: " + (d.value ? d.value : 0);
+        });
+        
+        partyChart.width(990)
+        .height(200)
+        .margins({top: 10,right: 50,bottom: 30,left: 60})
+        .dimension(Parties)
+        .group(statsByParties)
+        .colors(d3.scale.category10())
+        .keyAccessor(function(p) {
+            return p.value.Deputies;
+        })
+        .valueAccessor(function(p) {
+            return p.value.votes;
+        })
+        .radiusValueAccessor(function(p, i) {
+            return p.value.votes / (p.value.Deputies+1)*(0.4 + 0.6*Math.random());
+        })
+        .x(d3.scale.linear().domain([30, 90]))
+        .y(d3.scale.linear().domain([0, 1e7]))
+        .r(d3.scale.linear().domain([0, 1e6]))
+        .minRadiusWithLabel(15)
+        .elasticY(true)
+        .yAxisPadding(2e6)
+        .elasticX(true)
+        .xAxisPadding(5)
+        .maxBubbleRelativeSize(0.15)
+        .renderHorizontalGridLines(true)
+        .renderVerticalGridLines(true)
+        .renderLabel(true)
+        .renderTitle(true)
+        .title(function(p) {
+            return p.key 
+            + "\n" 
+            + "Milletvekili: " + p.value.Deputies + "\n" 
+            + "Seçmen Sayısı: " + p.value.votes;
+        });
+        partyChart.yAxis().tickFormat(function(s) {
+            return s / 1e6 + " M.";
+        });
+        partyChart.xAxis().tickFormat(function(s) {
+            return s;
+        });
+        dc.renderAll();
+    });
+});
+</script>
+    </body>
+</html>
