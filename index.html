@@ -11,7 +11,6 @@
         <meta name="keywords" content="geojson, türkiye, harita, map, turkey, tr, javascript, json">
         <link rel="canonical" href="preview.png">
 
-
         <!-- Social: Twitter -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:site" content="@github">
@@ -21,7 +20,7 @@
         <meta name="twitter:image:src" content="preview.png">
 
         <!-- Social: Facebook / Open Graph -->
-        <meta property="og:url" content="https://github.com/cihadturhan/tr-geojson">
+        <meta property="og:url" content="http://lab.cihadturhan.com/tr-geojson/">
         <meta property="og:type" content="article">
         <meta property="og:title" content="Türkiye Haritası Örnek Kullanımı - Genel Seçim Sonuçları">
         <meta property="og:image" content="preview.png">
@@ -47,9 +46,9 @@
 
         <div class="container">
             <div class="row">
-            <div class="col-xs-12">    
+            <div class="col-xs-12">
                     <h2 class="text-center page-header">2015 Türkiye Genel Seçim Sonuçları</h2>
-                    
+
                      <ul>
                         <li>Herhangi bir şehir veya baloncuğa tıklayın</li>
                         <li>Aynı anda birden fazlasına tıklayabilirsiniz</li>
@@ -84,7 +83,7 @@
 
         </div>
 
-        
+
 
         <script type="text/javascript" src="js/d3.js">
 
@@ -108,14 +107,14 @@ var partyChart = dc.bubbleChart("#party-chart");
 
 d3.csv("sonuclar.csv", function(csv) {
     var data = crossfilter(csv);
-    
+
     var cities = data.dimension(function(d) {
         return d["City"];
     });
     var stateRaisedSum = cities.group().reduceSum(function(d) {
         return d["Votes"];
     });
-    
+
     var Parties = data.dimension(function(d) {
         return d["Parties"];
     });
@@ -124,27 +123,27 @@ d3.csv("sonuclar.csv", function(csv) {
         p.Deputies += +v["Deputies"];
         p.votes += +v["Votes"];
         return p;
-    }, 
+    },
     function(p, v) {
         p.Deputies -= +v["Deputies"];
         p.votes -= +v["Votes"];
         return p;
-    }, 
+    },
     function() {
         return {Deputies: 0,votes: 0}
     }
     );
-    
+
     var rounds = data.dimension(function(d) {
         return d["Subregion"];
     });
-    
-    
+
+
     var projection = d3.geo.mercator()
     .scale(2000)
     .center([35.243322, 38.963745])
     .precision(0.1);
-    
+
     d3.json("geo/tr-cities-utf8.json", function(statesJson) {
         trChart.width(990)
         .height(500)
@@ -161,7 +160,7 @@ d3.csv("sonuclar.csv", function(csv) {
         .title(function(d) {
             return "Şehir: " + d.key + "\nToplam Oy: " + (d.value ? d.value : 0);
         });
-        
+
         partyChart.width(990)
         .height(200)
         .margins({top: 10,right: 50,bottom: 30,left: 60})
@@ -191,9 +190,9 @@ d3.csv("sonuclar.csv", function(csv) {
         .renderLabel(true)
         .renderTitle(true)
         .title(function(p) {
-            return p.key 
-            + "\n" 
-            + "Milletvekili: " + p.value.Deputies + "\n" 
+            return p.key
+            + "\n"
+            + "Milletvekili: " + p.value.Deputies + "\n"
             + "Seçmen Sayısı: " + p.value.votes;
         });
         partyChart.yAxis().tickFormat(function(s) {
