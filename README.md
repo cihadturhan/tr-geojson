@@ -1,7 +1,7 @@
 # Türkiye GeoJSON map
 GeoJSON formatted file, with Turkish provinces listed and ID'ed according to city codes and licenses plates of Turkey.
 
-İndirme linkleri: **[UTF8](geo/tr-cities-utf8.json)**
+download link: **[UTF8](geo/tr-cities-utf8.json)**
 
 
 # Python Example:
