@@ -4,6 +4,34 @@ GeoJSON formatted file, with Turkish provinces listed and ID'ed according to cit
 İndirme linkleri: **[UTF8](geo/tr-cities-utf8.json)**
 
 
+# Python Example:
+
+```
+import json
+import folium
+import pandas as pd
+
+DataSet = pd.DataFrame(somedatafile)  # somedatafile could be the file of the data set
+# Map code based on:
+# Python: Choropleth Haritalama
+# https://link.medium.com/r5mRGSt8Y8
+
+geo_str = json.dumps(json.load(open("tr-cities-utf8.json", 'r')))  # data of the map
+
+maptr   = folium.Map(location=[39,35.5], tiles=None, zoom_start=7)
+
+folium.Choropleth( geo_data=geo_str,
+                   name='choropleth',
+                   data=DataSet,
+                   columns=[0, 2],     # the related coulumns numbers from the data file
+                   key_on='feature.id',
+                   fill_color='Spectral',
+                   ).add_to(maptr)
+
+# folium.LayerControl().add_to(maptr)
+maptr.save('resultsmap.html')
+```
+
 
 ## Lisans
 
