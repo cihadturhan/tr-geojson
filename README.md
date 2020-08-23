@@ -1,13 +1,9 @@
-# Türkiye GeoJSON haritası
-Şehirlere ayrılmış GeoJSON formatlı dosyayı Türkiye'deki şehirleri listelemek, üzerinde data görselleştirme yapmak veya herhangi interaktif demo için kullanabilirsiniz. İki adet karakter kodlamasından size uygun olanı indiriniz.
+# Türkiye GeoJSON map
+GeoJSON formatted file, with Turkish provinces listed and ID'ed according to city codes and licenses plates of Turkey.
 
-İndirme linkleri: **[ANSI](geo/tr-cities-ansi.json)** / **[UTF8](geo/tr-cities-utf8.json)**
+İndirme linkleri: **[UTF8](geo/tr-cities-utf8.json)**
 
 
-## Örnek
-Örnek için küçük bir [seçim sonucu sayfası](http://lab.cihadturhan.com/tr-geojson/) yaptım. Şu an henüz seçim olmamış olduğundan veriler *tamamen rastgele* üretilmiştir. Kodlari burda mevcuttur.
-
-![Preview](preview.png "Preview")
 
 ## Lisans
 
