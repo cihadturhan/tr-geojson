@@ -1,13 +1,37 @@
-# Türkiye GeoJSON haritası
-Şehirlere ayrılmış GeoJSON formatlı dosyayı Türkiye'deki şehirleri listelemek, üzerinde data görselleştirme yapmak veya herhangi interaktif demo için kullanabilirsiniz. İki adet karakter kodlamasından size uygun olanı indiriniz.
+# Türkiye GeoJSON map
+GeoJSON formatted file, with Turkish provinces listed and ID'ed according to city codes and licenses plates of Turkey.
 
-İndirme linkleri: **[ANSI](geo/tr-cities-ansi.json)** / **[UTF8](geo/tr-cities-utf8.json)**
+download link: **[UTF8](geo/tr-cities-utf8.json)**
 
 
-## Örnek
-Örnek için küçük bir [seçim sonucu sayfası](http://lab.cihadturhan.com/tr-geojson/) yaptım. Şu an henüz seçim olmamış olduğundan veriler *tamamen rastgele* üretilmiştir. Kodlari burda mevcuttur.
+# Python Example:
 
-![Preview](preview.png "Preview")
+```
+import json
+import folium
+import pandas as pd
+
+DataSet = pd.DataFrame(somedatafile)  # somedatafile could be the file of the data set
+# Map code based on:
+# Python: Choropleth Haritalama
+# https://link.medium.com/r5mRGSt8Y8
+
+geo_str = json.dumps(json.load(open("tr-cities-utf8.json", 'r')))  # data of the map
+
+maptr   = folium.Map(location=[39,35.5], tiles=None, zoom_start=7)
+
+folium.Choropleth( geo_data=geo_str,
+                   name='choropleth',
+                   data=DataSet,
+                   columns=[0, 2],     # the related coulumns numbers from the data file
+                   key_on='feature.id',
+                   fill_color='Spectral',
+                   ).add_to(maptr)
+
+# folium.LayerControl().add_to(maptr)
+maptr.save('resultsmap.html')
+```
+
 
 ## Lisans
 
